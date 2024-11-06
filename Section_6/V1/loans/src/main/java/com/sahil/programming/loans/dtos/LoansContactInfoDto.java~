@@ -1,0 +1,7 @@
+package com.sahil.programming.loans.dtos;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "loans")
+public record LoansContactInfoDto() {
+}
