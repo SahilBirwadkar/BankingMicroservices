@@ -10,7 +10,7 @@ spring:
 #        native:
 #          search-locations: "classpath:/config"
         git:
-          uri: "https://github.com/SahilBirwadkar/bank-configuration.git"
+          uri: "https://github.com/SahilBirwadkar/BankingMicroservices/tree/a597776729f1d1346ad0277aacda5275f67b8db9/bank-config"
           default-label: main
           timeout: 5
           clone-on-start: true
