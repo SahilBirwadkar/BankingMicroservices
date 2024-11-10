@@ -3,8 +3,6 @@ server:
 spring:
   application:
     name: "loans"
-  profiles:
-    active: "prod"
   datasource:
     url: jdbc:h2:mem:testdb
     driverClassName: org.h2.Driver
@@ -25,7 +23,6 @@ spring:
     port: 5672
     username: "guest"
     password: "guest"
-
 
 management:
   endpoints:
