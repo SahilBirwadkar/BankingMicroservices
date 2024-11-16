@@ -18,4 +18,4 @@ services:
       service: microservice-base-config
     environment:
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
-      SPRING_PROFILE_ACTIVE: qa
+      SPRING_PROFILE_ACTIVE: "qa"
