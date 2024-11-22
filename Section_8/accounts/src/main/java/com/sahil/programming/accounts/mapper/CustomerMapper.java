@@ -1,6 +1,7 @@
 package com.sahil.programming.accounts.mapper;
 
 import com.sahil.programming.accounts.Models.Customer;
+import com.sahil.programming.accounts.dtos.CustomerDetailsDto;
 import com.sahil.programming.accounts.dtos.CustomerDto;
 
 public class CustomerMapper {
@@ -9,6 +10,13 @@ public class CustomerMapper {
         customerDto.setEmail(customer.getEmail());
         customerDto.setMobileNumber(customer.getMobileNumber());
         return customerDto;
+    }
+
+    public static CustomerDetailsDto mapToCustomerDetailDto(Customer customer, CustomerDetailsDto customerDetailsDto) {
+        customerDetailsDto.setName(customer.getName());
+        customerDetailsDto.setEmail(customer.getEmail());
+        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
+        return customerDetailsDto;
     }
 
     public static Customer mapToCustomer(CustomerDto customerDto, Customer customer) {
