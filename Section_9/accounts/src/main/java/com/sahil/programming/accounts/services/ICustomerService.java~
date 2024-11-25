@@ -1,5 +1,0 @@
-package com.sahil.programming.accounts.services;
-
-public interface ICustomerService {
-    CustomerDetailsDto fetchCustomerDetails(String mobileNumber);
-}

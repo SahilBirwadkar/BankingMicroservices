@@ -1,8 +1,8 @@
 server:
-  port: 8090
+  port: 8080
 spring:
   application:
-    name: "loans"
+    name: "accounts"
   profiles:
     active: "prod"
   datasource:
@@ -56,8 +56,8 @@ eureka:
 
 info:
   app:
-    name: "loans"
-    description: "loans microservice"
+    name: "accounts"
+    description: "Accounts Microservice"
     version: "1.0.0"
 
 logging:
@@ -65,4 +65,4 @@ logging:
     com:
       sahil:
         programming:
-          loans: DEBUG
+          gatewayserver:DEBUG
