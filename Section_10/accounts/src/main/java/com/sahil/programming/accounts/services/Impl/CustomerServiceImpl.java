@@ -12,6 +12,7 @@ import com.sahil.programming.accounts.services.Client.CardsFeignClient;
 import com.sahil.programming.accounts.services.Client.LoansFeignClient;
 import com.sahil.programming.accounts.services.ICustomerService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +45,8 @@ public class CustomerServiceImpl implements ICustomerService {
         CustomerDetailsDto customerDetailsDto = CustomerMapper.mapToCustomerDetailDto(customer,new CustomerDetailsDto());
         customerDetailsDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts,new AccountsDto()));
 
-        ResponseEntity<CardDto> cardDtoResponseEntity = cardsFeignClient.fetchCardDetails(correlationId,mobileNumber);
-        CardDto cardDto = cardDtoResponseEntity.getBody();
+        ResponseEntity<CardsDto> cardDtoResponseEntity = cardsFeignClient.fetchCardDetails(correlationId,mobileNumber);
+        CardsDto cardDto = cardDtoResponseEntity.getBody();
 
         ResponseEntity<LoansDto> loansDtoResponseEntity = loansFeignClient.fetchLoanDetails(correlationId,mobileNumber);
         LoansDto loansDto = loansDtoResponseEntity.getBody();

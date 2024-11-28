@@ -15,5 +15,5 @@ public class CustomerDetailsDto {
     private String mobileNumber;
     private AccountsDto accountsDto;
     private LoansDto loansDto;
-    private CardDto cardsDto;
+    private CardsDto cardsDto;
 }
