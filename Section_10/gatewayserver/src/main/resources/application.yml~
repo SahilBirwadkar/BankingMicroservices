@@ -9,7 +9,9 @@ spring:
         locator:
           enabled: false
           lowerCaseServiceId: true
-
+      httpclient:
+        connectTimeout: 10000
+        responseTimeout: 
 management:
   endpoints:
     web:
@@ -34,11 +36,11 @@ logging:
       sahil:
         programming:
           gatewayserver: DEBUG
-          
+
 resilience4j.circuitbreaker:
   configs:
     default:
-      slidingWindowSize:10
-      permittedNumberOfCallsInHalfOpenState:2
-      failureRateThreshold:50
-      waitDurationInOpenState:10000
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 2
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000

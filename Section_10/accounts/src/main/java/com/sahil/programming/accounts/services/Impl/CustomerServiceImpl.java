@@ -21,38 +21,37 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class CustomerServiceImpl implements ICustomerService {
+    private AccountRepository accountsRepository;
     private CustomerRepository customerRepository;
-    private AccountRepository accountRepository;
     private CardsFeignClient cardsFeignClient;
     private LoansFeignClient loansFeignClient;
 
-
+    /**
+     * @param mobileNumber - Input Mobile Number
+     *  @param correlationId - Correlation ID value generated at Edge server
+     * @return Customer Details based on a given mobileNumber
+     */
     @Override
     public CustomerDetailsDto fetchCustomerDetails(String mobileNumber, String correlationId) {
-        Optional<Customer> customerOptional = customerRepository.findByMobileNumber(mobileNumber);
-        if(customerOptional.isEmpty()){
-            throw new ResourceNotFoundException("Customer","mobileNumber",mobileNumber);
+        Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
+        );
+        Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(
+                () -> new ResourceNotFoundException("Account", "customerId", customer.getCustomerId().toString())
+        );
+
+        CustomerDetailsDto customerDetailsDto = CustomerMapper.mapToCustomerDetailDto(customer, new CustomerDetailsDto());
+        customerDetailsDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts, new AccountsDto()));
+
+        ResponseEntity<LoansDto> loansDtoResponseEntity = loansFeignClient.fetchLoanDetails(correlationId, mobileNumber);
+        if (null != loansDtoResponseEntity) {
+            customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
         }
-        Customer customer = customerOptional.get();
 
-        Optional<Accounts> accountsOptional = accountRepository.findByCustomerId(customer.getCustomerId());
-        if (accountsOptional.isEmpty()){
-            throw new ResourceNotFoundException("Account","customerId",customer.getCustomerId().toString());
+        ResponseEntity<CardsDto> cardsDtoResponseEntity = cardsFeignClient.fetchCardDetails(correlationId, mobileNumber);
+        if (null != cardsDtoResponseEntity) {
+            customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
         }
-        Accounts accounts = accountsOptional.get();
-
-
-        CustomerDetailsDto customerDetailsDto = CustomerMapper.mapToCustomerDetailDto(customer,new CustomerDetailsDto());
-        customerDetailsDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts,new AccountsDto()));
-
-        ResponseEntity<CardsDto> cardDtoResponseEntity = cardsFeignClient.fetchCardDetails(correlationId,mobileNumber);
-        CardsDto cardDto = cardDtoResponseEntity.getBody();
-
-        ResponseEntity<LoansDto> loansDtoResponseEntity = loansFeignClient.fetchLoanDetails(correlationId,mobileNumber);
-        LoansDto loansDto = loansDtoResponseEntity.getBody();
-
-        customerDetailsDto.setLoansDto(loansDto);
-        customerDetailsDto.setCardsDto(cardDto);
 
         return customerDetailsDto;
     }
