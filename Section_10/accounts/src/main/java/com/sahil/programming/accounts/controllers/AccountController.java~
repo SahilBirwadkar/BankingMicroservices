@@ -213,12 +213,14 @@ public class AccountController {
 
     @Retry(name = "getBuildInfo", fallbackMethod = "getBuildInfoFallback")
     @GetMapping("/build-info")
-    public ResponseEntity<String> getBuildInfo() {
+    public ResponseEntity<AccountsContactInfoDto> getBuildInfo() {
         logger.debug("getBuildInfo() method Invoked");
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(buildVersion);
+        throw new NullPointerException();
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(accountsContactInfoDto);
     }
+
     public ResponseEntity<String> getBuildInfoFallback(Throwable throwable){
         logger.debug("getBuildInfoFallback() method Invoked");
         return ResponseEntity
