@@ -1,9 +1,6 @@
 package com.sahil.programming.accounts.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +13,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Customer extends BaseModel{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "customer_id")
     private Long customerId;
     private String name;
     private String email;
+    @Column(name = "mobile_number")
     private String mobileNumber;
 }

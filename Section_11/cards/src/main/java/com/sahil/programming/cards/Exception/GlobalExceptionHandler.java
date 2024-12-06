@@ -1,5 +1,6 @@
 package com.sahil.programming.cards.Exception;
 
+import com.sahil.programming.cards.controller.CardsController;
 import com.sahil.programming.cards.dtos.ErrorResponseDto;
 import com.sahil.programming.cards.dtos.ResponseDto;
 import org.springframework.http.HttpHeaders;
@@ -8,7 +9,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.ErrorResponse;
+
+import org.slf4j.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +39,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         });
         return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(CardsController.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleAllException(Exception exception, WebRequest webRequest) {

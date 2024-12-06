@@ -12,13 +12,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -28,8 +32,11 @@ import org.springframework.web.bind.annotation.*;
 )
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @RestController
+@Validated
 public class CardsController {
     private ICardsService iCardsService;
+
+    private static final Logger logger = LoggerFactory.getLogger(CardsController.class);
 
     @Autowired
     public CardsController(ICardsService iCardsService) {
@@ -60,7 +67,7 @@ public class CardsController {
         )
     })
     @PostMapping("/create")
-    public ResponseEntity<ResponseDto> createCard(@RequestParam @Pattern(regexp = "(^$|[0-9]{10})") String mobileNumber){
+    public ResponseEntity<ResponseDto> createCard(@Valid @RequestParam @Pattern(regexp = "(^$|[0-9]{10})") String mobileNumber){
         iCardsService.createCard(mobileNumber);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -73,7 +80,7 @@ public class CardsController {
     )
     @ApiResponses({
             @ApiResponse(
-                    responseCode = "201",
+                    responseCode = "200",
                     description = "HTTP Status OK"
             ),
             @ApiResponse(
@@ -83,8 +90,14 @@ public class CardsController {
             )
     })
     @GetMapping("/fetch")
-    public ResponseEntity<CardDto> fetchCardDetails(@RequestParam String mobileNumber){
+    public ResponseEntity<CardDto> fetchCardDetails(@RequestHeader("eazybank-correlation-id") String correlationId,
+                                                    @RequestParam  @Pattern(
+                                                            regexp="(^$|[0-9]{10})",message = "Mobile number must be 10 digits")
+
+                                                    String mobileNumber){
+        logger.debug("fetchCardDetails method start");
         CardDto cardDto = iCardsService.fetchCardDetails(mobileNumber);
+        logger.debug("fetchCardDetails method end");
         return ResponseEntity.status(HttpStatus.OK).body(cardDto);
     }
 

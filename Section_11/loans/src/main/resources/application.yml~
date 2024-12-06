@@ -1,8 +1,8 @@
 server:
-  port: 9000
+  port: 8090
 spring:
   application:
-    name: "cards"
+    name: "loans"
   profiles:
     active: "prod"
   datasource:
@@ -59,8 +59,8 @@ eureka:
 
 info:
   app:
-    name: "cards"
-    description: "Cards Microservices"
+    name: "loans"
+    description: "loans microservice"
     version: "1.0.0"
 
 logging:
@@ -68,6 +68,5 @@ logging:
     com:
       sahil:
         programming:
-          cards: DEBUG
-  pattern:
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+          loans: DEBUG
+  
