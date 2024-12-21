@@ -1,4 +1,20 @@
 services:
+  rabbit:
+    image: rabbitmq:3.13-management
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.2
     container_name: keycloak
@@ -255,8 +271,6 @@ services:
   accounts:
     image: "sahilbirwdkar35/accounts:s12"
     container_name: accounts-ms
-    ports:
-      - "8080:8080"
     depends_on:
       configserver:
         condition: service_healthy
@@ -264,9 +278,9 @@ services:
         condition: service_healthy
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
+      interval: 20s
       timeout: 5s
-      retries: 10
+      retries: 20
       start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "accounts"
@@ -277,18 +291,16 @@ services:
   loans:
     image: "sahilbirwdkar35/loans:s12"
     container_name: loans-ms
-    ports:
-      - "8090:8090"
     depends_on:
       configserver:
         condition: service_healthy
       eurekaserver:
         condition: service_healthy
     healthcheck:
-      test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
       timeout: 5s
-      retries: 10
+      retries: 20
       start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "loans"
@@ -299,24 +311,34 @@ services:
   cards:
     image: "sahilbirwdkar35/cards:s12"
     container_name: cards-ms
-    ports:
-      - "9000:9000"
     depends_on:
       configserver:
         condition: service_healthy
       eurekaserver:
         condition: service_healthy
     healthcheck:
-      test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
       timeout: 5s
-      retries: 10
+      retries: 20
       start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "cards"
     extends:
       file: common-config.yml
       service: microservice-eurekaserver-config
+
+  message:
+    image: "sahilbirwdkar35/message:s13"
+    container_name: message-ms
+    depends_on:
+      rabbit:
+        condition: service_healthy
+    environment:
+      SPRING_RABBITMQ_HOST: "rabbit"
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
 
   gatewayserver:
     image: "sahilbirwdkar35/gatewayserver:s12"
@@ -329,8 +351,6 @@ services:
       cards:
         condition: service_healthy
       loans:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"

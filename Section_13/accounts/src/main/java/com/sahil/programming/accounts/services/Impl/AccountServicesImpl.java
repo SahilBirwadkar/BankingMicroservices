@@ -8,26 +8,28 @@ import com.sahil.programming.accounts.Repositories.AccountRepository;
 import com.sahil.programming.accounts.Repositories.CustomerRepository;
 import com.sahil.programming.accounts.constants.AccountsConstants;
 import com.sahil.programming.accounts.dtos.AccountsDto;
+import com.sahil.programming.accounts.dtos.AccountsMsgDto;
 import com.sahil.programming.accounts.dtos.CustomerDto;
 import com.sahil.programming.accounts.mapper.AccountsMapper;
 import com.sahil.programming.accounts.mapper.CustomerMapper;
 import com.sahil.programming.accounts.services.IAccountServices;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Random;
 
 @Service
+@AllArgsConstructor
 public class AccountServicesImpl implements IAccountServices {
     private AccountRepository accountRepository;
     private CustomerRepository customerRepository;
-
-    @Autowired
-    public AccountServicesImpl(AccountRepository accountRepository, CustomerRepository customerRepository) {
-        this.accountRepository = accountRepository;
-        this.customerRepository = customerRepository;
-    }
+    private StreamBridge streamBridge;
+    private static final Logger logger = LoggerFactory.getLogger(AccountServicesImpl.class);
 
     @Override
     public void createAccount(CustomerDto customerDto) {
@@ -45,8 +47,18 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         Customer newCustomer = customerRepository.save(customer);
-        accountRepository.save(createNewAccount(newCustomer));
+        Accounts savedAccount = accountRepository.save(createNewAccount(newCustomer));
+        sendCommunication(savedAccount,newCustomer);
     }
+
+    public void sendCommunication(Accounts account, Customer customer){
+        var accountsMsgDto = new AccountsMsgDto(account.getAccountNumber(),customer.getName(),
+                customer.getEmail(),customer.getMobileNumber());
+        logger.info("Sending Communication request for the details: {}",accountsMsgDto.toString());
+        var result = streamBridge.send("sendCommunication-out-0",accountsMsgDto);
+        logger.info("Is the Communication request successfully triggered ? : {}",result);
+    }
+
 
     @Override
     public CustomerDto fetchAccount(String mobileNumber) {
